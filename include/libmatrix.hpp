@@ -1,3 +1,4 @@
+#include <math.h>
 #include <iostream>
 
 namespace libmatrix{
@@ -54,12 +55,20 @@ namespace libmatrix{
             /**
              * dot product with another vector (give as an argument)
              **/
-            float dot();
+            float dot(Vector<N,T> &other){
+                float sum = 0;
+                for(int i = 0; i < N; ++i){
+                    sum += tab[i] * other.at(i);
+                }
+                return sum;
+            }
 
             /**
              * returns true if the vector is orthogonal to another given as an argument, false otherwise
              **/
-            bool is_ortho();
+            bool is_ortho(Vector<N,T> &other){
+                return dot(other) == 0;
+            }
 
             /**
              * returns true if the vector contains an invalid value, false otherwise. Notably, if the vector contains nan as values.
@@ -69,17 +78,32 @@ namespace libmatrix{
             /**
              * returns true if the vector is unit, false otherwise
              **/
-            bool is_unit();
+            bool is_unit(){
+                return norm() == 1;
+            }
             
             /**
              * returns the norm of the vector
              **/
-            Vector<N, T> norm();
+            float norm(){
+                float squareSum = 0;
+                for(int i = 0; i < N; ++i){
+                    squareSum += tab[i] * tab[i];
+                }
+                return std::sqrt(squareSum);
+            }
 
             /**
              * Returns a copy of the vector normalised
              **/
-            Vector<N, T> to_unit();
+            Vector<N, T> *to_unit(){
+                Vector<N,T> *unit = new Vector<N,T>;
+                float invNorm = 1/norm();
+                for(int i = 0; i < N; ++i){
+                    unit->set(i,invNorm * tab[i]);
+                }
+                return unit;
+            }
             
             friend std::ostream &operator<<(std::ostream &s,const Vector &vec){
                 s<<"[";
