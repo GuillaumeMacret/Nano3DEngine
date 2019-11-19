@@ -34,4 +34,10 @@ int main(){
     Vector<3,int> *vUnit = v2.to_unit();
     std::cout<<"Vector 2 unit: "<<*vUnit<<std::endl;
 
+    Vector<3,int> vAdd = v1 + v2;
+    std::cout<<"Vector 1 + 2 (+) : "<<vAdd<<std::endl;
+
+    v1 += v2;
+    std::cout<<"Vector 1 + 2 (+=) : "<<v1<<std::endl;
+
 }

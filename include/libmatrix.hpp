@@ -11,6 +11,9 @@ namespace libmatrix{
             Vector(){
                 tab = new T[N];
             }
+            Vector(Vector<N,T> &&vec):tab(vec.tab){
+                vec.tab = nullptr;
+            }
             ~Vector(){
                 delete [] tab;
             }
@@ -43,7 +46,7 @@ namespace libmatrix{
                 if(N < 3){
                     throw std::string("Too few arguments to do cross product");
                 }else{
-                    Vector<3,T> *crossVec = new Vector<3,T>;
+                    Vector<3,T> *crossVec = new Vector<3,T>();
                     crossVec->set(0,tab[1] * other.at(2) - tab[2] * other.at(1));
                     crossVec->set(1, tab[2] * other.at(0) - tab[0] * other.at(2));
                     crossVec->set(2, tab[0] * other.at(1) - tab[1] * other.at(0));
@@ -104,7 +107,7 @@ namespace libmatrix{
                 }
                 return unit;
             }
-            
+
             friend std::ostream &operator<<(std::ostream &s,const Vector &vec){
                 s<<"[";
                 for(int i = 0; i < N; ++i){
@@ -113,5 +116,56 @@ namespace libmatrix{
                 s<<"]";
                 return s;
             }
+
+            T &operator[](int i){
+                return tab[i];
+            }
+
+            Vector<N,T> operator+(Vector<N,T> &other){
+                Vector<N, T> sumVec;
+                for(int i = 0; i < N; ++i){
+                    sumVec[i] = tab[i] + other[i];
+                }
+                return sumVec;
+            }
+
+            void operator+=(Vector<N,T> &other){
+                for(int i = 0; i < N; ++i){
+                    tab[i] += other[i];
+                }
+            }
+
+            void operator+=(Vector<N,T> &other){
+                for(int i = 0; i < N; ++i){
+                    tab[i] -= other[i];
+                }
+            }
+
+            Vector<N,T> operator-(Vector<N,T> & other){
+                Vector<N, T> difVec;
+                for(int i = 0; i < N; ++i){
+                    difVec[i] = tab[i] - other[i];
+                }
+                return difVec;
+            }
+
+            Vector<N,T> operator-(){
+                for(int i = 0; i < N; ++i){
+                    tab[i] *= -1;
+                }
+            }
+
+            Vector<N,T> operator*(float scalar){
+                Vector<N, T> vec;
+                for(int i = 0; i < N; ++i){
+                    vec[i] = tab[i] * scalar;
+                }
+                return vec;
+            }
+
+            Vector<N,T> operator*(Matrix mat){
+                //TODO
+            }
+
     };
 }
