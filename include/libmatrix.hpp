@@ -258,13 +258,13 @@ class Matrix {
             matDouble[0][i] = matDouble[maxIndex][i];
             matDouble[maxIndex][i] = tmp;
           }
-          std::cout << "Pivoted matrix : " << std::endl;
-          for (int i = 0; i < N; ++i) {
-            for (int j = 0; j < N * 2; ++j) {
-              std::cout << matDouble[i][j] << ",";
-            }
-            std::cout << std::endl;
-          }
+          // std::cout << "Pivoted matrix : " << std::endl;
+          // for (int i = 0; i < N; ++i) {
+          //   for (int j = 0; j < N * 2; ++j) {
+          //     std::cout << matDouble[i][j] << ",";
+          //   }
+          //   std::cout << std::endl;
+          // }
         }
         // Divide row 0, add other
         for (int i = 0; i < N; ++i) {
@@ -276,29 +276,68 @@ class Matrix {
             } else {
               if (!coefInited) {
                 lineCoef = -matDouble[i][j];
-                std::cout << "Coef inited to : " << lineCoef << std::endl;
+                // std::cout << "Coef inited to : " << lineCoef << std::endl;
                 coefInited = true;
               }
 
-              std::cout << "Mat double[" << i << "][" << k << "] ("
-                        << matDouble[i][k]
-                        << ") += " << (matDouble[0][k] * lineCoef) << "("
-                        << matDouble[0][k] << " * " << lineCoef << ")"
-                        << std::endl;
+              // std::cout << "Mat double[" << i << "][" << k << "] ("
+              //           << matDouble[i][k]
+              //           << ") += " << (matDouble[0][k] * lineCoef) << "("
+              //           << matDouble[0][k] << " * " << lineCoef << ")"
+              //           << std::endl;
 
               matDouble[i][k] += matDouble[0][k] * lineCoef;
             }
           }
         }
 
-        std::cout << "Calculated matrix : " << std::endl;
-        for (int i = 0; i < N; ++i) {
-          for (int j = 0; j < N * 2; ++j) {
-            std::cout << matDouble[i][j] << ",";
+        // std::cout << "Calculated matrix : " << std::endl;
+        // for (int i = 0; i < N; ++i) {
+        //   for (int j = 0; j < N * 2; ++j) {
+        //     std::cout << matDouble[i][j] << ",";
+        //   }
+        //   std::cout << std::endl;
+        // }
+      }
+      // std::cout << "End matrix : " << std::endl;
+      // for (int i = 0; i < N; ++i) {
+      //   for (int j = 0; j < N * 2; ++j) {
+      //     std::cout << matDouble[i][j] << ",";
+      //   }
+      //   std::cout << std::endl;
+      // }
+      // Swaping rows to get the diag
+      for(int j = 0; j < N; ++j){
+        if(matDouble[j][j] != 1){
+          for(int k = j; k < N; ++k){
+            if(matDouble[k][j] == 1){
+              //do swap
+              T tmp;
+              for (int i = 0; i < N * 2; ++i) {
+                tmp = matDouble[j][i];
+                matDouble[j][i] = matDouble[k][i];
+                matDouble[k][i] = tmp;
+              }
+            }
           }
-          std::cout << std::endl;
         }
       }
+      // std::cout << "End pivoted matrix : " << std::endl;
+      // for (int i = 0; i < N; ++i) {
+      //   for (int j = 0; j < N * 2; ++j) {
+      //     std::cout << matDouble[i][j] << ",";
+      //   }
+      //   std::cout << std::endl;
+      // }
+      
+      // Keep right side only
+      for(int i = 0; i < N; ++i){
+        for(int j = 0; j < N; ++j){
+          (*inverseMat)[i][j] = matDouble[i][j+N];
+        }
+      }
+      std::cout<<*inverseMat<<std::endl;
+      return inverseMat;
     }
   }
 

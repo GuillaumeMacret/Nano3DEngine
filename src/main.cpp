@@ -59,14 +59,14 @@ int main(){
     mat1[2][1] = 3;
     mat1[2][2] = 2;
 
-    //mat1.inverse();
+    mat1.inverse();
 
-    std::cout << mat1 << std::endl;
-    std::cout << *mat1.transpose() << std::endl;
-    std::cout << (mat1 == mat1) << " " << (mat1 == *mat1.transpose())<<std::endl;
-    std::cout << (mat1 + *mat1.transpose())<<std::endl;
-    mat1+= *mat1.transpose();
-    std::cout << mat1 <<std::endl;
-    std::cout << mat1 * v1<<std::endl;
-    std::cout << mat1 * mat1<<std::endl;
+    // std::cout << mat1 << std::endl;
+    // std::cout << *mat1.transpose() << std::endl;
+    // std::cout << (mat1 == mat1) << " " << (mat1 == *mat1.transpose())<<std::endl;
+    // std::cout << (mat1 + *mat1.transpose())<<std::endl;
+    // mat1+= *mat1.transpose();
+    // std::cout << mat1 <<std::endl;
+    // std::cout << mat1 * v1<<std::endl;
+    // std::cout << mat1 * mat1<<std::endl;
 }
