@@ -1,3 +1,6 @@
+#ifndef LIBMATRIXH
+#define LIBMATRIXH
+
 #include <cmath>
 #include <iostream>
 
@@ -9,8 +12,22 @@ class Vector {
   T* tab;
 
  public:
-  Vector() { tab = new T[N]; }
+  Vector() { 
+    tab = new T[N]; 
+    for(int i = 0; i < N; ++i){
+      tab[i] = 0;
+    }
+  }
+  
   Vector(Vector<N, T>&& vec) : tab(vec.tab) { vec.tab = nullptr; }
+  
+  Vector(T inTab[N]){
+    tab = new T[N];
+    for(int i = 0; i < N; ++i){
+      tab[i] = inTab[i];
+    }
+  }
+
   ~Vector() { delete[] tab; }
   /**
    * Sets the index i at the val val
@@ -71,7 +88,8 @@ class Vector {
 
   /**
    * returns true if the vector contains an invalid value, false otherwise.
-   *Notably, if the vector contains nan as values.
+   * Notably, if the vector contains nan as values.
+   * TODO
    **/
   bool is_null();
 
@@ -143,9 +161,11 @@ class Vector {
   }
 
   Vector<N, T> operator-() {
+    T invTab[N];
     for (int i = 0; i < N; ++i) {
-      tab[i] *= -1;
+      invTab[i] = tab[i] * -1;
     }
+    return std::move(Vector(invTab));
   }
 
   Vector<N, T> operator*(float scalar) {
@@ -162,9 +182,14 @@ class Vector {
 //   }
 };
 
+class Vector2i : public Vector<2,int>{};
+class Vector3i : public Vector<3,int>{};
+class Vector4i : public Vector<4,int>{};
+class Vector2r : public Vector<2,float>{};
+class Vector3r : public Vector<3,float>{};
+
 
 /************************************************************************************************/
-
 
 template <int N, int M, typename T>
 class Matrix {
@@ -211,11 +236,9 @@ class Matrix {
     if (N != M) {
       return inverseMat;
     } else {
-      T d;
       T matDouble[N][N * 2];
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N * 2; ++j) {
-          // std::cout<<i<<" "<<j<<std::endl;
           if (j < N) {
             matDouble[i][j] = mat[i][j];
           } else if (j % N == i) {
@@ -223,16 +246,8 @@ class Matrix {
           } else {
             matDouble[i][j] = 0;
           }
-          // matDouble[i][j] = i*100 + j;
         }
       }
-      // std::cout<<"Merged matrix : "<<std::endl;
-      // for (int i = 0; i < N; ++i){
-      //     for (int j = 0; j < N * 2; ++j){
-      //         std::cout << matDouble[i][j] << ",";
-      //     }
-      //     std::cout << std::endl;
-      // }
 
       /* Pivot */
       // for each column j of M'
@@ -258,13 +273,7 @@ class Matrix {
             matDouble[0][i] = matDouble[maxIndex][i];
             matDouble[maxIndex][i] = tmp;
           }
-          // std::cout << "Pivoted matrix : " << std::endl;
-          // for (int i = 0; i < N; ++i) {
-          //   for (int j = 0; j < N * 2; ++j) {
-          //     std::cout << matDouble[i][j] << ",";
-          //   }
-          //   std::cout << std::endl;
-          // }
+          
         }
         // Divide row 0, add other
         for (int i = 0; i < N; ++i) {
@@ -276,36 +285,13 @@ class Matrix {
             } else {
               if (!coefInited) {
                 lineCoef = -matDouble[i][j];
-                // std::cout << "Coef inited to : " << lineCoef << std::endl;
                 coefInited = true;
               }
-
-              // std::cout << "Mat double[" << i << "][" << k << "] ("
-              //           << matDouble[i][k]
-              //           << ") += " << (matDouble[0][k] * lineCoef) << "("
-              //           << matDouble[0][k] << " * " << lineCoef << ")"
-              //           << std::endl;
-
               matDouble[i][k] += matDouble[0][k] * lineCoef;
             }
           }
         }
-
-        // std::cout << "Calculated matrix : " << std::endl;
-        // for (int i = 0; i < N; ++i) {
-        //   for (int j = 0; j < N * 2; ++j) {
-        //     std::cout << matDouble[i][j] << ",";
-        //   }
-        //   std::cout << std::endl;
-        // }
       }
-      // std::cout << "End matrix : " << std::endl;
-      // for (int i = 0; i < N; ++i) {
-      //   for (int j = 0; j < N * 2; ++j) {
-      //     std::cout << matDouble[i][j] << ",";
-      //   }
-      //   std::cout << std::endl;
-      // }
       // Swaping rows to get the diag
       for(int j = 0; j < N; ++j){
         if(matDouble[j][j] != 1){
@@ -322,14 +308,6 @@ class Matrix {
           }
         }
       }
-      // std::cout << "End pivoted matrix : " << std::endl;
-      // for (int i = 0; i < N; ++i) {
-      //   for (int j = 0; j < N * 2; ++j) {
-      //     std::cout << matDouble[i][j] << ",";
-      //   }
-      //   std::cout << std::endl;
-      // }
-      
       // Keep right side only
       for(int i = 0; i < N; ++i){
         for(int j = 0; j < N; ++j){
@@ -444,4 +422,19 @@ class Matrix {
   }
 };
 
+class Mat44r : public Matrix<4,4,float>{};
+
+#define zerovector Vector()
+
+#define zerovec2i Vector2i()
+#define zerovec3i Vector3i()
+#define zerovec4i Vector4i()
+#define zerovec2r Vector2r()
+#define zerovec3r Vector3r()
+#define zerovec4r Vector4r()
+
+//TODO
+//#define IdentityMat Matrix()
+
 }  // namespace libmatrix
+#endif
