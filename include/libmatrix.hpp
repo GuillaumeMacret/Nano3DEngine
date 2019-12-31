@@ -8,7 +8,7 @@ namespace libmatrix {
 
 template <int N, typename T>
 class Vector {
- private:
+ protected:
   T* tab;
 
  public:
@@ -186,7 +186,21 @@ class Vector2i : public Vector<2,int>{};
 class Vector3i : public Vector<3,int>{};
 class Vector4i : public Vector<4,int>{};
 class Vector2r : public Vector<2,float>{};
-class Vector3r : public Vector<3,float>{};
+class Vector3r : public Vector<3,float>{
+  public:
+    Vector3r(float x, float y, float z){
+      tab = new float[3];
+      tab[0] = x;
+      tab[1] = y;
+      tab[2] = z;
+    }
+
+    Vector3r operator*(Vector3r other){
+      return Vector3r(tab[1] * other[2] - tab[2] * other[1],
+        tab[2] * other[0] - tab[0] * other[2],
+        tab[0] * other[1] - tab[1] * other[0]);
+    }
+};
 
 
 /************************************************************************************************/

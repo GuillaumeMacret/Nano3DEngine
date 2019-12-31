@@ -82,6 +82,20 @@ int main(){
     
     Direction<3,float> xDir;
     xDir[0] = 1;
+    std::cout<<"Direction : "<<xDir<<std::endl;
+    Point<3,float> p1, p2;
+    p1[0] = 1;
+    p1[1] = 3;
+    p1[2] = 1;
+    std::cout<<"Points : "<<p1<<" "<<p2<<std::endl;
+    Direction<3,float> distance = p1.length_to(p2);
+    std::cout<<"Distance between those two : "<<distance<<std::endl;
+    Quaternion<double> q(3.0, 1.0, 3.0), q2(1,2,3,4);
+    std::cout<<"Quaternion : "<<q<<" Im part : " << q.im()<<std::endl;
+    q2+=q2;
+    std::cout<<"Sum : "<<q2<<std::endl;
+
+    std::cout<<"Prod : "<<q2 * q2<<std::endl;
     /*
     Quaternion<float> q1(45.0f,xDir);
     std::cout<<q1<<std::endl;
