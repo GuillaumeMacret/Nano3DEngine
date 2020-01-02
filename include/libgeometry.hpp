@@ -48,8 +48,21 @@ namespace libgeometry{
 
             //constructs a quaternion corresponding to the rotation defined by the angle (in degrees) and the axis (class Direction) given as arguments.
             //TODO test
-            Quaternion(double angle, Direction<3,T> axis){
-                Quaternion(angle * axis[0], angle * axis[1], angle * axis[2]);
+            Quaternion(double angle, Direction<3,T> &axis){
+                double yaw = angle * axis[0], pitch = angle * axis[1], roll = angle * axis[2];
+                //Quaternion(angle * axis[0], angle * axis[1], angle * axis[2]);
+
+                double cy = cos(yaw * 0.5);
+                double sy = sin(yaw * 0.5);
+                double cp = cos(pitch * 0.5);
+                double sp = sin(pitch * 0.5);
+                double cr = cos(roll * 0.5);
+                double sr = sin(roll * 0.5);
+
+                vector[0] = cy * cp * cr + sy * sp * sr;
+                vector[1] = cy * cp * sr - sy * sp * cr;
+                vector[2] = sy * cp * sr + cy * sp * cr;
+                vector[3] = sy * cp * cr - cy * sp * sr;
             }
 
             Quaternion(double yaw, double pitch, double roll){// yaw (Z), pitch (Y), roll (X)
@@ -79,26 +92,28 @@ namespace libgeometry{
             }
 
             //Returns the conjugate
-            //TODO
             Quaternion conjugate(){
-                return nullptr;
+                return Quaternion(vector[0],-vector[1],-vector[2], -vector[3]);
             }
 
             //Returns the norm
-            //TODO
+            //TODO good formula ?
             T norm(){
-                return nullptr;
+                T norm = 0;
+                for(int i = 0; i < 4; ++i){
+                    norm += vector[i] * vector[i];
+                }
+                return std::sqrt(norm);
+            }
+
+            //TODO
+            Quaternion inverse(){
+
             }
 
             //Returns the imaginary part
             Vector3r im(){
                 return Vector3r(vector[1],vector[2],vector[3]);
-            }
-
-            //Returns the inverse
-            //TODO
-            Quaternion inverse(){
-                return nullptr;
             }
 
             //Return the real part
@@ -123,15 +138,16 @@ namespace libgeometry{
                 vector[3] += q[3];
             }
 
-            //TODO
+            //TODO test
             Quaternion<T> operator*(Quaternion<T> &q){
-                /*
-                T realPart = re() * q.re() - (im().dot(q.im()));
-                Vector3r imPart = im();
-                return Quaternion(realPart, imPart);
-                */
-               throw std::string("Not implemented quaternion multiplication");
-               return Quaternion();
+                T s1 = re(), s2 = q.re();
+                Vector3r v1 = im(), v2 = q.im();
+                T realPart = s1*s2 - (v1.dot(v2));
+
+                Vector3r prod = v1*v2;
+                Vector3r p1 = v2 * s1, p2 = v1 * s2;
+                Vector<3,double> imPart = p1 + p2 + prod;
+                return std::move(Quaternion(realPart, imPart[0],imPart[1],imPart[2]));
             }
 
             //TODO operators -, -=, *, *=
@@ -367,6 +383,55 @@ namespace libgeometry{
 
             friend std::ostream& operator<<(std::ostream& s, const Rectangle t){
                 s<<"P0 : " << t.p0 <<"; P1 : "<<t.p1<<"; P2 : "<<t.p2<<"; P3 : "<<t.p3;
+                return s;
+            }
+    };
+
+    class Transform{
+        public:
+            Vector4r translation;
+            Mat33r matrix;
+
+            Transform(Matrix<3,3,double> m, Vector<4,double> t){
+                for(int i = 0; i < 3; ++i){
+                    translation[i] = t[i];
+                    for(int j = 0; j < 3; ++j){
+                        matrix[i][j] = m[i][j];
+                    }
+                }
+                translation[3] = t[3];
+            }
+
+            Transform(Vector4r t){
+                for(int i = 0; i < 4; ++i){
+                    translation[i]  = t[i];
+                }
+            }
+
+            Transform(Vector3r scale){
+                for(int i = 0; i < 3; ++i){
+                    matrix[i][i] = scale[i];
+                }
+            }
+
+            Transform(Quaternion<double>& quat){
+                //TODO
+                double w = quat[0], x = quat[1], y = quat[2], z = quat[3];
+
+                matrix[0][0] = 1 - 2 * (y*y) - 2 * (z*z);
+            }
+
+            //TODO
+            Transform(double angle, Direction<3, double> axis){
+            }
+
+            //TODO test
+            Transform concat(Transform &tr){
+                return Transform(matrix + tr.matrix,translation + tr.translation);
+            }
+
+            friend std::ostream& operator<<(std::ostream& s, const Transform &t){
+                s<<"Translation : "<<t.translation<< "; Rotation & scale : "<<t.matrix;
                 return s;
             }
     };

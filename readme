@@ -1,0 +1,13 @@
+Pour compiler avec la bibliothèque SDL:
+
+1. Installer la bibliothèque de l'adresse: http://www.libsdl.org/
+
+2. Ajouter dans le makefile (Ubuntu):
+    LIB :=-L/usr/lib/x86_64-linux-gnu/ -lSDL2 -lSDL2_ttf 
+
+2'. Ajouter dans le makefile (MacOS):
+    LIB := -F /Library/Frameworks -framework SDL2 -framework SDL2_ttf
+    INC := -I/Library/Frameworks/SDL2.framework/Headers -I/Library/Frameworks/SDL2_ttf.framework/Headers -F/Library/Frameworks 
+
+3. Ajouter dans la ligne de compilation:
+    g++ fichier.cpp -o fichier.o $(LIB) $(INC)

@@ -142,7 +142,7 @@ class Vector {
     for (int i = 0; i < N; ++i) {
       sumVec[i] = tab[i] + other[i];
     }
-    return sumVec;
+    return std::move(Vector(sumVec.tab));
   }
 
   void operator+=(Vector<N, T>& other) {
@@ -173,7 +173,7 @@ class Vector {
     return std::move(Vector(invTab));
   }
 
-  Vector<N, T> operator*(double &scalar) {
+  Vector<N, T> operator*(double scalar) {
     Vector<N, T> vec;
     for (int i = 0; i < N; ++i) {
       vec[i] = tab[i] * scalar;
@@ -181,7 +181,7 @@ class Vector {
     return vec;
   }
 
-  void operator*=(double &scalar){
+  void operator*=(double scalar){
     for (int i = 0; i < N; ++i) {
       tab[i] *= scalar;
     }
@@ -199,10 +199,10 @@ class Vector {
 //   }
 };
 
-class Vector2i : public Vector<2,int>{};
+class Vec2i : public Vector<2,int>{};
 class Vector3i : public Vector<3,int>{};
 class Vector4i : public Vector<4,int>{};
-class Vector2r : public Vector<2,double>{};
+class Vec2r : public Vector<2,double>{};
 class Vector3r : public Vector<3,double>{
   public:
     Vector3r(double x, double y, double z){
@@ -212,13 +212,37 @@ class Vector3r : public Vector<3,double>{
       tab[2] = z;
     }
 
-    Vector3r operator*(Vector3r other){
+    Vector3r operator*(Vector3r &other){
       return Vector3r(tab[1] * other[2] - tab[2] * other[1],
         tab[2] * other[0] - tab[0] * other[2],
         tab[0] * other[1] - tab[1] * other[0]);
     }
+
+    Vector3r operator*(double scalar) {
+      return std::move(Vector3r(tab[0] * scalar,tab[1] * scalar,tab[2] * scalar));
+  }
+
+    Vector3r(){
+     for(int i = 0; i < 3; ++i){
+      tab[i]  = 0;
+      }
+    }
 };
-class Vector4r : public Vector<4,double>{};
+class Vector4r : public Vector<4,double>{
+  public:
+    Vector4r(){
+      for(int i = 0; i < 4; ++i){
+        tab[i] = 0;
+      }
+    }
+    Vector4r(double x, double y, double z, double dir){
+      tab = new double[4];
+      tab[0] = x;
+      tab[1] = y;
+      tab[2] = z;
+      tab[3] = dir;
+    }
+};
 
 
 
@@ -456,10 +480,11 @@ class Matrix {
 };
 
 class Mat44r : public Matrix<4,4,double>{};
+class Mat33r : public Matrix<3,3,double>{};
 
 #define zerovector Vector()
 
-#define zerovec2i Vector2i()
+#define zerovec2i Vec2i()
 #define zerovec3i Vector3i()
 #define zerovec4i Vector4i()
 #define zerovec2r Vector2r()

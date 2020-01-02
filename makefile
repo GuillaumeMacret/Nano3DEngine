@@ -23,7 +23,7 @@ CDEBUG = -g
 OS := $(shell uname)
 ifeq ($(OS), Linux)
     INC := -I$(HDR_DIR)
-    LIBS := #-L/usr/lib/x86_64-linux-gnu/ -lSDL2 -lSDL2_ttf
+    LIBS := -L/usr/lib/x86_64-linux-gnu/ -lSDL2 -lSDL2_ttf
 else ifeq ($(OS), Darwin)
     INC := -I$(HDR_DIR) -I/Library/Frameworks/SDL2.framework/Headers/\
            -I/Library/Frameworks/SDL2_ttf.framework/Headers -F/Library/Frameworks/
