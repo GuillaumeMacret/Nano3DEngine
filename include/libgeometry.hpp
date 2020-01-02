@@ -44,9 +44,11 @@ namespace libgeometry{
         private:
             Vector<4,T> vector;
         public:
+            Quaternion(){}
+
             //constructs a quaternion corresponding to the rotation defined by the angle (in degrees) and the axis (class Direction) given as arguments.
             //TODO test
-            Quaternion(float angle, Direction<3,T> axis){
+            Quaternion(double angle, Direction<3,T> axis){
                 Quaternion(angle * axis[0], angle * axis[1], angle * axis[2]);
             }
 
@@ -128,6 +130,8 @@ namespace libgeometry{
                 Vector3r imPart = im();
                 return Quaternion(realPart, imPart);
                 */
+               throw std::string("Not implemented quaternion multiplication");
+               return Quaternion();
             }
 
             //TODO operators -, -=, *, *=
@@ -145,18 +149,31 @@ namespace libgeometry{
     template <int N, typename T>
     class Point{
         private:
-            Vector<N,T> vec;
         public:
+            Vector<N,T> vec;
+
             Point(){
                 for(int i = 0; i < N; ++i){
                     vec[i] = 0;
                 }
             }
 
+            Point(Vector<N,T> &v){
+                for(int i = 0; i < N; ++i){
+                    vec[i] = v[i];
+                }
+            }
+
+            Point(Point<N,T> &p){
+                for(int i = 0; i < N; ++i){
+                    vec[i] = p[i];
+                }
+            }
+
             //TODO test
             bool behind(Plane<N,T> plane){
                 Vector<N,T> *unitDir = plane.vector.to_unit();
-                float x = unitDir->dot(vec) + plane.point;
+                double x = unitDir->dot(vec) + plane.point;
                 return x < 0;
             }
 
@@ -175,7 +192,7 @@ namespace libgeometry{
 
             //Returns true if the point is inside a sphere
             //TODO test
-            bool outside(Sphere<N,T> sphere){
+            bool outside(Sphere<N,T> &sphere){
                 Direction<N,T> dist = length_to(sphere.center);
                 for(int i = 0; i < N; ++i){
                     if(dist[i] > sphere.radius)return false;
@@ -197,25 +214,162 @@ namespace libgeometry{
             T at(int i){
                 return vec.at(i);
             }
+
+            Point<N,T> operator*(T &scalar){
+                return Point<N,T>(vec * scalar);
+            }
+
+            Point<N,T> operator+(Point<N,T> &p){
+                return Point<N,T>(vec + p.vec);
+            }
+
+            void operator=(Point<N,T> &p){
+                vec = p.vec;
+            }
     };
 
     template <int N, typename T>
     class Sphere{
-        Point<N,T> center;
-        T radius;
+        public:
+            Point<N,T> center;
+            T radius;
+
+            Sphere(Point<N,T> &center, T radius):center(center), radius(radius){}
+
+            //Returns trus if the sphere is behing a plane given as argument
+            //TODO
+            bool behind(Plane<N,T> plane){
+                return center.behind(plane);
+            }
+
+            bool is_null(){
+                return center.is_null() || std::isnan(radius);
+            }
+
+            friend std::ostream &operator<<(std::ostream &s, Sphere &sphere){
+                s<<"Center : "<<sphere.center<<"; Radius : "<<sphere.radius;
+                return s;
+            }
     };
 
     template <int N, typename T>
     class Plane{
         private:
         public:
-            Point <N,T> point;
-            Vector<N,T> vector;
+            Vector4r vector;
+            
+            Plane(T a, T b, T c, T d){
+                vector[0] = a;
+                vector[1] = b;
+                vector[2] = c;
+                vector[3] = d;
+            }
+            
             //Returns true if the plane contains an invalid value, false otherwise
             bool is_null(){
-                //TODO
-                return nullptr;
+                return vector.is_null();
+            }
+
+            friend std::ostream& operator<<(std::ostream& s, const Plane& p){
+                s<<p.vector;
+                return s;
             }
     };
+
+    template <int N, typename T>
+    class LineSegment{
+        private:
+            Point <4,T> begin, end;
+        public:
+            LineSegment(Vector3r b, Vector3r e){
+                begin[0] = b[0];
+                end[0] = e[0];
+                begin[1] = b[1];
+                end[1] = e[1];
+                begin[2] = b[2];
+                end[2] = e[2];
+                begin[3] = 0;
+                end[3] = 1;
+            }
+
+            Point<N,T> get_begin(){return begin;}
+            Point<N,T> get_end(){return end;}
+
+            //returns the coefficient of intersection between the segment and a plane
+            //The coefficient of intersection determines if the line whose the segment belongs is in front, behind or lies on the plane
+            //TODO
+            T inter_coef(Plane<N,T> &plane){
+                
+            }
+
+            // returns the intersection point between the segment and the plane
+            //TODO test deeper & change pointer to ref
+            Point<N,T> *inter(Plane<N,T> &p){
+                double upper = p.vector.dot(begin.vec);
+                double lower = p.vector.dot(end.vec);
+                if(lower == 0){
+                    std::cerr<<"Error divided by 0"<<std::endl;
+                    throw std::string("Divided by 0 in intersection calculations");
+                }else{
+                    double coef = -upper/lower;
+                    auto r = end.vec * coef;
+                    r += begin.vec;
+
+                    Point<N,T> *lePoint = new Point<N,T>(r);
+                    return lePoint;
+                }
+            }
+
+            bool is_null(){
+                return begin.is_null() || end.is_null();
+            }
+
+            friend std::ostream& operator<<(std::ostream& s, const LineSegment& seg) {
+                s<<"Begin : "<<seg.begin<<"; End : "<<seg.end;
+                return s;
+            }
+    };
+
+    class Triangle{
+        public:
+            Point<3,double> p0,p1,p2;
+            Point<3,double> get_p0(){return p0;}
+            Point<3,double> get_p1(){return p1;}
+            Point<3,double> get_p2(){return p2;}
+
+            Triangle(Point<3,double>p0, Point<3,double>p1, Point<3,double>p2):p0(p0),p1(p1),p2(p2){}
+
+            //Returns the area of the triangle
+            //TODO
+            void area(){
+
+            }
+
+            bool is_null(){
+                return p0.is_null() || p1.is_null() || p2.is_null();
+            }
+
+            friend std::ostream& operator<<(std::ostream& s, const Triangle t){
+                s<<"P0 : " << t.p0 <<"; P1 : "<<t.p1<<"; P2 : "<<t.p2;
+                return s;
+            }
+    };
+
+    class Rectangle{
+        public:
+            Point<3,double> p0,p1,p2,p3;
+            
+            Rectangle(Point<3,double>p0, Point<3,double>p1, Point<3,double>p2, Point<3,double>p3):p0(p0),p1(p1),p2(p2),p3(p3){}
+
+            bool is_null(){
+                return p0.is_null() || p1.is_null() || p2.is_null() || p3.is_null();
+            }
+
+            friend std::ostream& operator<<(std::ostream& s, const Rectangle t){
+                s<<"P0 : " << t.p0 <<"; P1 : "<<t.p1<<"; P2 : "<<t.p2<<"; P3 : "<<t.p3;
+                return s;
+            }
+    };
+
 } //namespace libgeometry
 #endif

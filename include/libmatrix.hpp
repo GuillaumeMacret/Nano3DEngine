@@ -72,8 +72,8 @@ class Vector {
   /**
    * dot product with another vector (give as an argument)
    **/
-  float dot(Vector<N, T>& other) {
-    float sum = 0;
+  double dot(Vector<N, T> &other) {
+    double sum = 0;
     for (int i = 0; i < N; ++i) {
       sum += tab[i] * other.at(i);
     }
@@ -91,7 +91,12 @@ class Vector {
    * Notably, if the vector contains nan as values.
    * TODO
    **/
-  bool is_null();
+  bool is_null(){
+    for(int i =0; i < N; ++i){
+      if(std::isnan(tab[i])){return true;}
+    }
+    return false;
+  }
 
   /**
    * returns true if the vector is unit, false otherwise
@@ -101,8 +106,8 @@ class Vector {
   /**
    * returns the norm of the vector
    **/
-  float norm() {
-    float squareSum = 0;
+  double norm() {
+    double squareSum = 0;
     for (int i = 0; i < N; ++i) {
       squareSum += tab[i] * tab[i];
     }
@@ -114,7 +119,7 @@ class Vector {
    **/
   Vector<N, T>* to_unit() {
     Vector<N, T>* unit = new Vector<N, T>;
-    float invNorm = 1 / norm();
+    double invNorm = 1 / norm();
     for (int i = 0; i < N; ++i) {
       unit->set(i, invNorm * tab[i]);
     }
@@ -168,12 +173,24 @@ class Vector {
     return std::move(Vector(invTab));
   }
 
-  Vector<N, T> operator*(float scalar) {
+  Vector<N, T> operator*(double &scalar) {
     Vector<N, T> vec;
     for (int i = 0; i < N; ++i) {
       vec[i] = tab[i] * scalar;
     }
     return vec;
+  }
+
+  void operator*=(double &scalar){
+    for (int i = 0; i < N; ++i) {
+      tab[i] *= scalar;
+    }
+  }
+
+  Vector<N,T> operator=(Vector<N,T> &otherV){
+    for(int i = 0; i < N; ++i){
+      tab[i] = otherV[i];
+    }
   }
 
 //   template <int M>
@@ -185,11 +202,11 @@ class Vector {
 class Vector2i : public Vector<2,int>{};
 class Vector3i : public Vector<3,int>{};
 class Vector4i : public Vector<4,int>{};
-class Vector2r : public Vector<2,float>{};
-class Vector3r : public Vector<3,float>{
+class Vector2r : public Vector<2,double>{};
+class Vector3r : public Vector<3,double>{
   public:
-    Vector3r(float x, float y, float z){
-      tab = new float[3];
+    Vector3r(double x, double y, double z){
+      tab = new double[3];
       tab[0] = x;
       tab[1] = y;
       tab[2] = z;
@@ -201,6 +218,8 @@ class Vector3r : public Vector<3,float>{
         tab[0] * other[1] - tab[1] * other[0]);
     }
 };
+class Vector4r : public Vector<4,double>{};
+
 
 
 /************************************************************************************************/
@@ -339,10 +358,10 @@ class Matrix {
   bool is_null() {
     for (int i = 0; i < N; ++i) {
       for (int j = 0; j < M; ++j) {
-        if (std::isnan(mat[i][j])) return false;
+        if (std::isnan(mat[i][j])) return true;
       }
     }
-    return true;
+    return false;
   }
 
   Matrix* transpose() {
@@ -436,7 +455,7 @@ class Matrix {
   }
 };
 
-class Mat44r : public Matrix<4,4,float>{};
+class Mat44r : public Matrix<4,4,double>{};
 
 #define zerovector Vector()
 
