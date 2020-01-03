@@ -97,7 +97,6 @@ namespace libgeometry{
             }
 
             //Returns the norm
-            //TODO good formula ?
             T norm(){
                 T norm = 0;
                 for(int i = 0; i < 4; ++i){
@@ -108,7 +107,8 @@ namespace libgeometry{
 
             //TODO
             Quaternion inverse(){
-
+                T bottom = norm() * norm();
+                return std::move(conjugate() * (1/bottom));
             }
 
             //Returns the imaginary part
@@ -136,6 +136,10 @@ namespace libgeometry{
                 vector[1] += q[1];
                 vector[2] += q[2];
                 vector[3] += q[3];
+            }
+
+            Quaternion<T> operator*(double scalar){
+                return std::move(Quaternion(vector[0] * scalar, vector[1] * scalar, vector[2] * scalar, vector[3] * scalar));
             }
 
             //TODO test
@@ -171,6 +175,12 @@ namespace libgeometry{
             Point(){
                 for(int i = 0; i < N; ++i){
                     vec[i] = 0;
+                }
+            }
+
+            Point(T tab[N]){
+                for(int i = 0; i < N; ++i){
+                    vec[i] = tab[i];
                 }
             }
 
@@ -273,6 +283,8 @@ namespace libgeometry{
         private:
         public:
             Vector4r vector;
+
+            Plane(){}
             
             Plane(T a, T b, T c, T d){
                 vector[0] = a;
@@ -355,6 +367,12 @@ namespace libgeometry{
 
             Triangle(Point<3,double>p0, Point<3,double>p1, Point<3,double>p2):p0(p0),p1(p1),p2(p2){}
 
+            void operator=(Triangle &&tr){
+                p0 = tr.p0;
+                p1 = tr.p1;
+                p2 = tr.p2;
+            }
+
             //Returns the area of the triangle
             //TODO
             void area(){
@@ -365,7 +383,7 @@ namespace libgeometry{
                 return p0.is_null() || p1.is_null() || p2.is_null();
             }
 
-            friend std::ostream& operator<<(std::ostream& s, const Triangle t){
+            friend std::ostream& operator<<(std::ostream& s, const Triangle &t){
                 s<<"P0 : " << t.p0 <<"; P1 : "<<t.p1<<"; P2 : "<<t.p2;
                 return s;
             }
@@ -415,19 +433,51 @@ namespace libgeometry{
             }
 
             Transform(Quaternion<double>& quat){
-                //TODO
+                //TODOtest
                 double w = quat[0], x = quat[1], y = quat[2], z = quat[3];
 
                 matrix[0][0] = 1 - 2 * (y*y) - 2 * (z*z);
+                matrix[0][1] = 2 * x * y - 2 * w * z;
+                matrix[0][2] = 2 *x * z + 2 * w * y;
+                matrix[1][0] = 2 * x * y + 2 * w * z;
+                matrix[1][1] = 1 - 2 * x * x - 2 * z * z;
+                matrix[1][2] = 2 * y * z - 2 * w * x;
+                matrix[2][0] = 2 * x * z - 2 * w * y;
+                matrix[2][1] = 2 * y * z + 2 * w * x;
+                matrix[2][2] = 1 - 2 * x * x - 2 * y * y;
             }
 
-            //TODO
-            Transform(double angle, Direction<3, double> axis){
+            //TODO test
+            Transform(double angle, Direction<3, double> &axis){
+                Quaternion<double> quat(angle, axis);
+
+                double w = quat[0], x = quat[1], y = quat[2], z = quat[3];
+
+                matrix[0][0] = 1 - 2 * (y*y) - 2 * (z*z);
+                matrix[0][1] = 2 * x * y - 2 * w * z;
+                matrix[0][2] = 2 *x * z + 2 * w * y;
+                matrix[1][0] = 2 * x * y + 2 * w * z;
+                matrix[1][1] = 1 - 2 * x * x - 2 * z * z;
+                matrix[1][2] = 2 * y * z - 2 * w * x;
+                matrix[2][0] = 2 * x * z - 2 * w * y;
+                matrix[2][1] = 2 * y * z + 2 * w * x;
+                matrix[2][2] = 1 - 2 * x * x - 2 * y * y;
             }
 
             //TODO test
             Transform concat(Transform &tr){
                 return Transform(matrix + tr.matrix,translation + tr.translation);
+            }
+
+            //TODO
+            // returns the quaternion corresponding to a rotation stored in the transform
+            Quaternion<double> to_quat(){
+
+            }
+
+            //todo
+            Point<3,double> apply(Point<3,double> point){
+
             }
 
             friend std::ostream& operator<<(std::ostream& s, const Transform &t){

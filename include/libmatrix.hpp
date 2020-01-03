@@ -43,7 +43,7 @@ class Vector {
   /**
    * addresses the i-th element (i is give as an argument) of the vector
    **/
-  T at(int i) {
+  T at(int i) const{
     if (i < 0 || i > N) {
       throw std::string("Index out of range");
     } else {
@@ -199,10 +199,31 @@ class Vector {
 //   }
 };
 
-class Vec2i : public Vector<2,int>{};
+class Vec2i : public Vector<2,int>{
+  public:
+    Vec2i(){
+      tab[0] = 0;
+      tab[1] = 0;
+    }
+    Vec2i(int x, int y){
+      tab[0] = x;
+      tab[1] = y;
+    }
+};
 class Vector3i : public Vector<3,int>{};
 class Vector4i : public Vector<4,int>{};
-class Vec2r : public Vector<2,double>{};
+class Vec2r : public Vector<2,double>{
+  public:
+    Vec2r(double x, double y){
+      tab[0] = x;
+      tab[1] = y;
+    }
+
+    Vec2r(Vec2r &v2){
+      tab[0] = v2[0];
+      tab[1] = v2[1];
+    }
+};
 class Vector3r : public Vector<3,double>{
   public:
     Vector3r(double x, double y, double z){

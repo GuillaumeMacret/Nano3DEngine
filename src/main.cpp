@@ -1,12 +1,29 @@
 #include <iostream>
 #include "../include/libmatrix.hpp"
 #include "../include/libgeometry.hpp"
-//#include "scene.hpp"
+#include "scene.hpp"
+#include <fstream>
 
 using namespace libmatrix;
 using namespace libgeometry;
 
-int main(){
+//! opens a geo file and inserts the object in the scene
+void load_geo_file(const char *file, Scene &scene){
+    int nbVertex;
+    std::fstream geoFile(file);
+    if(!file)throw std::string("Could not open file ");
+
+    while (geoFile>>nbVertex){
+        float x,y,z;
+        std::cout<<"New shape of "<<nbVertex<<" vertex"<<std::endl;
+        for(int i = 0; i < nbVertex; ++i){
+            geoFile>>x>>y>>z;
+            std::cout<<x<<" "<<y<<" "<<z<<std::endl;
+        }
+    }
+}
+
+int main(int argc, const char *argv[]){
     // libmatrix test
     {
         Vector<3,double> v1,v2,v3,v4;
@@ -96,6 +113,7 @@ int main(){
         std::cout<<"Quaternion : "<<q<<" Im part : " << q.im()<<std::endl;
         std::cout<<"Quaternion conjuge : "<<q.conjugate()<<std::endl;
         std::cout<<"Quaternion norm : "<<q.norm()<<std::endl;
+        std::cout<<"Quaternion inv : "<<q.inverse()<<std::endl;
         q2+=q2;
         std::cout<<"Sum+= : "<<q2<<std::endl;
 
@@ -137,10 +155,21 @@ int main(){
         Quaternion<double> q3(30,xDir);
         std::cout<<"Quaternion : "<<q3<<std::endl;
         Transform trans4(q3);
-
-
+        std::cout<<"Transform4 : "<<trans4<<std::endl;
+        Transform trans5(30,xDir);
+        std::cout<<"Transform5 : "<<trans5<<std::endl;
     }
 
-    //////////////////////////////////////////////////////////////
+    //3D thing test
+    {
+        /*
+        Gui gui;
+        gui.start();
+        */
+       Scene scene;
+       if(argc > 0){
+           load_geo_file(argv[1],scene);
+       }
+    }
 
 }
