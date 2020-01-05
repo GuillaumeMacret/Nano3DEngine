@@ -12,16 +12,25 @@ void load_geo_file(const char *file, Scene &scene){
     int nbVertex;
     std::fstream geoFile(file);
     if(!file)throw std::string("Could not open file ");
+    int cpt = 0;
 
     while (geoFile>>nbVertex){
         float x,y,z;
-        std::cout<<"New shape of "<<nbVertex<<" vertex"<<std::endl;
+        scene.objects3D.push_back(new Object3D());
+        scene.objects3D.back()->name = "Object" + (cpt++);
+        //std::cout<<"New shape of "<<nbVertex<<" vertex"<<std::endl;
         for(int i = 0; i < nbVertex; ++i){
             geoFile>>x>>y>>z;
-            std::cout<<x<<" "<<y<<" "<<z<<std::endl;
+            scene.objects3D.back() -> add_vertex(x,y,z);
+            if(i >= 2){
+                scene.objects3D.back() -> add_face(i, i-1, i-2);
+            }
+            //std::cout<<x<<" "<<y<<" "<<z<<std::endl;
         }
     }
 }
+
+#include <unistd.h>
 
 int main(int argc, const char *argv[]){
     // libmatrix test
@@ -122,7 +131,7 @@ int main(int argc, const char *argv[]){
         LineSegment<4,double> seg1(Vector3r(0,0,0), Vector3r(1,1,1));
         std::cout<<"Segment : "<< seg1<<std::endl;
 
-        Plane<4,double> plane1(0,1,0,0);
+        Plane<double> plane1(0,1,0,0);
         std::cout<<"Plane"<<plane1<<std::endl;
 
         std::cout<<"Plane & seg intersect : " <<*seg1.inter(plane1)<<std::endl;
@@ -162,14 +171,24 @@ int main(int argc, const char *argv[]){
 
     //3D thing test
     {
-        /*
         Gui gui;
+            
+        Scene scene;
+        scene.gui = &gui;
+            
+        if(argc > 0){
+            load_geo_file(argv[1],scene);
+        }
+
+        std::cout<<"Objects in scene : "<<std::endl;
+
+        for(auto it = scene.objects3D.begin();it != scene.objects3D.end(); ++it){
+            std::cout<<**it<<std::endl;
+        }
+
         gui.start();
-        */
-       Scene scene;
-       if(argc > 0){
-           load_geo_file(argv[1],scene);
-       }
+        gui.main_loop(&scene);
+        gui.stop();
     }
 
 }

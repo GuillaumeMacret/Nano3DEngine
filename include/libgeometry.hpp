@@ -33,7 +33,7 @@ namespace libgeometry{
             }
     };
 
-    template <int N, typename T>
+    template <typename T>
     class Plane;
 
     template <int N,typename T>
@@ -47,7 +47,7 @@ namespace libgeometry{
             Quaternion(){}
 
             //constructs a quaternion corresponding to the rotation defined by the angle (in degrees) and the axis (class Direction) given as arguments.
-            //TODO test
+            //TODO 
             Quaternion(double angle, Direction<3,T> &axis){
                 double yaw = angle * axis[0], pitch = angle * axis[1], roll = angle * axis[2];
                 //Quaternion(angle * axis[0], angle * axis[1], angle * axis[2]);
@@ -190,14 +190,14 @@ namespace libgeometry{
                 }
             }
 
-            Point(Point<N,T> &p){
+            Point(Point<N,T> const &p){
                 for(int i = 0; i < N; ++i){
-                    vec[i] = p[i];
+                    vec[i] = p.at(i);
                 }
             }
 
             //TODO test
-            bool behind(Plane<N,T> plane){
+            bool behind(Plane<T> &plane)const{
                 Vector<N,T> *unitDir = plane.vector.to_unit();
                 double x = unitDir->dot(vec) + plane.point;
                 return x < 0;
@@ -237,7 +237,7 @@ namespace libgeometry{
             }
 
             T& operator[](int i){return vec[i];}
-            T at(int i){
+            T at(int i)const{
                 return vec.at(i);
             }
 
@@ -264,7 +264,7 @@ namespace libgeometry{
 
             //Returns trus if the sphere is behing a plane given as argument
             //TODO
-            bool behind(Plane<N,T> plane){
+            bool behind(Plane<T> plane){
                 return center.behind(plane);
             }
 
@@ -278,7 +278,7 @@ namespace libgeometry{
             }
     };
 
-    template <int N, typename T>
+    template <typename T>
     class Plane{
         private:
         public:
@@ -292,10 +292,21 @@ namespace libgeometry{
                 vector[2] = c;
                 vector[3] = d;
             }
+
+            Plane(Plane<T> const &p){
+                vector[0] = p.at(0);
+                vector[1] = p.at(1);
+                vector[2] = p.at(2);
+                vector[3] = p.at(3);
+            }
             
             //Returns true if the plane contains an invalid value, false otherwise
             bool is_null(){
                 return vector.is_null();
+            }
+
+            T at(int i)const{
+                return vector.at(i);
             }
 
             friend std::ostream& operator<<(std::ostream& s, const Plane& p){
@@ -319,6 +330,26 @@ namespace libgeometry{
                 begin[3] = 0;
                 end[3] = 1;
             }
+            LineSegment(Vector3r &b, Vector3r &e){
+                begin[0] = b[0];
+                end[0] = e[0];
+                begin[1] = b[1];
+                end[1] = e[1];
+                begin[2] = b[2];
+                end[2] = e[2];
+                begin[3] = 0;
+                end[3] = 1;
+            }
+            LineSegment(Point<4,T> const &b, Point<4,T> const &e){
+                begin[0] = b.at(0);
+                end[0] = e.at(0);
+                begin[1] = b.at(1);
+                end[1] = e.at(1);
+                begin[2] = b.at(2);
+                end[2] = e.at(2);
+                begin[3] = 0;
+                end[3] = 1;
+            }
 
             Point<N,T> get_begin(){return begin;}
             Point<N,T> get_end(){return end;}
@@ -326,13 +357,13 @@ namespace libgeometry{
             //returns the coefficient of intersection between the segment and a plane
             //The coefficient of intersection determines if the line whose the segment belongs is in front, behind or lies on the plane
             //TODO
-            T inter_coef(Plane<N,T> &plane){
+            T inter_coef(Plane<T> &plane){
                 
             }
 
             // returns the intersection point between the segment and the plane
             //TODO test deeper & change pointer to ref
-            Point<N,T> *inter(Plane<N,T> &p){
+            Point<N,T> *inter(Plane<T> &p){
                 double upper = p.vector.dot(begin.vec);
                 double lower = p.vector.dot(end.vec);
                 if(lower == 0){
@@ -361,9 +392,9 @@ namespace libgeometry{
     class Triangle{
         public:
             Point<3,double> p0,p1,p2;
-            Point<3,double> get_p0(){return p0;}
-            Point<3,double> get_p1(){return p1;}
-            Point<3,double> get_p2(){return p2;}
+            Point<3,double> get_p0()const{return p0;}
+            Point<3,double> get_p1()const{return p1;}
+            Point<3,double> get_p2()const{return p2;}
 
             Triangle(Point<3,double>p0, Point<3,double>p1, Point<3,double>p2):p0(p0),p1(p1),p2(p2){}
 
@@ -375,8 +406,8 @@ namespace libgeometry{
 
             //Returns the area of the triangle
             //TODO
-            void area(){
-
+            double area(){
+                
             }
 
             bool is_null(){

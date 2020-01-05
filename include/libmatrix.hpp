@@ -10,8 +10,8 @@ template <int N, typename T>
 class Vector {
  protected:
   T* tab;
-
  public:
+  T* getTab()const{return tab;}
   Vector() { 
     tab = new T[N]; 
     for(int i = 0; i < N; ++i){
@@ -217,6 +217,11 @@ class Vec2r : public Vector<2,double>{
     Vec2r(double x, double y){
       tab[0] = x;
       tab[1] = y;
+    }
+
+    Vec2r(){
+      tab[0] = 0;
+      tab[1] = 0;
     }
 
     Vec2r(Vec2r &v2){

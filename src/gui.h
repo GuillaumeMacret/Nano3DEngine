@@ -42,7 +42,7 @@ class Gui : public GuiInterface
 
     private:
         // TODO: make it more portable and search for a suitable file in the system path.
-        const char ttf_file[22] = "../fonts/VeraMono.ttf";
+        const char ttf_file[22] = "font/VeraMono.ttf";
         const unsigned int default_font_size { 12 };
         const int window_width { 1024 };
         const int window_height { 768 };
