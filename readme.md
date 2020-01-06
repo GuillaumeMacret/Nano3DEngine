@@ -12,5 +12,7 @@ make clean && make
 ## Pour executer le projet
 
 ```
-./bin/tdsv
+./bin/tdsv pathToGeoFile
+# For instance : 
+./bin/tdsv data/cube.geo
 ```
